@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.Sash;
 
 import org.eclipse.draw2d.ColorConstants;
 
-class Splitter extends Composite {
+public class Splitter extends Composite {
 
 	public static final int DEFAULT_SASH_WIDTH = 5;
 	private static final int DRAG_MINIMUM = 62;
