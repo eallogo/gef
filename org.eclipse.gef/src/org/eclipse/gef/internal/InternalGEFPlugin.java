@@ -11,7 +11,13 @@
 
 package org.eclipse.gef.internal;
 
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+
+import org.eclipse.gef.resources.GEFResources;
+import org.eclipse.gef.resources.IImageDescriptorFactory;
 
 import org.osgi.framework.BundleContext;
 
@@ -27,6 +33,32 @@ public class InternalGEFPlugin extends AbstractUIPlugin {
 	public void start(BundleContext bc) throws Exception {
 		super.start(bc);
 		context = bc;
+
+		GEFResources.getInstance().setImageRegistry(getImageRegistry());
+		GEFResources.getInstance().setPreferenceStore(getPreferenceStore());
+		IImageDescriptorFactory factory = new IImageDescriptorFactory() {
+			public ImageDescriptor createFolder() {
+				ISharedImages sharedImages = PlatformUI.getWorkbench()
+						.getSharedImages();
+				return sharedImages
+						.getImageDescriptor(ISharedImages.IMG_OBJ_FOLDER);
+			}
+
+			public ImageDescriptor createDeleteDisabled() {
+				ISharedImages sharedImages = PlatformUI.getWorkbench()
+						.getSharedImages();
+				return sharedImages
+						.getImageDescriptor(ISharedImages.IMG_TOOL_DELETE);
+			}
+
+			public ImageDescriptor createDelete() {
+				ISharedImages sharedImages = PlatformUI.getWorkbench()
+						.getSharedImages();
+				return sharedImages
+						.getImageDescriptor(ISharedImages.IMG_TOOL_DELETE_DISABLED);
+			}
+		};
+		GEFResources.getInstance().setImageDescriptorFactory(factory);
 	}
 
 	public static BundleContext getContext() {
