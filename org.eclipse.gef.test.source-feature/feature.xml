@@ -2,8 +2,8 @@
 <feature
       id="org.eclipse.gef.test.source"
       label="GEF Tests Sources"
-      version="3.9.100.qualifier"
-      provider-name="Eclipse.org"
+      version="3.10.200.qualifier"
+      provider-name="Eclipse GEF"
       license-feature="org.eclipse.license"
       license-feature-version="1.0.1">
 
