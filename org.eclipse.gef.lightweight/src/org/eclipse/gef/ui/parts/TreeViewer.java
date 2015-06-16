@@ -31,13 +31,11 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
-
 import org.eclipse.jface.viewers.StructuredSelection;
-
 import org.eclipse.draw2d.geometry.Point;
-
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPartViewer;
+import org.eclipse.gef.LightweightEditDomain;
 import org.eclipse.gef.TreeEditPart;
 import org.eclipse.gef.editparts.RootTreeEditPart;
 
@@ -236,6 +234,11 @@ public class TreeViewer extends AbstractEditPartViewer {
 			treeItems[i] = (TreeItem) part.getWidget();
 		}
 		tree.setSelection(treeItems);
+	}
+
+	public void setEditDomain(LightweightEditDomain editdomain) {
+		super.setEditDomain(editdomain);
+		getControl().setEnabled(editdomain == null || !editdomain.isDisabled());
 	}
 
 	/**

@@ -11,9 +11,11 @@
 package org.eclipse.gef;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.gef.commands.CommandStack;
+import org.eclipse.gef.tools.AbstractTool;
 import org.eclipse.gef.tools.SelectionTool;
 import org.eclipse.swt.dnd.DragSourceEvent;
 import org.eclipse.swt.events.FocusEvent;
@@ -32,11 +34,35 @@ public class LightweightEditDomain {
 	private Tool activeTool;
 	private List viewers = new ArrayList();
 	private CommandStack commandStack = new CommandStack();
+	protected boolean disabled;
+	protected Tool disabledTool;
 
 	/**
 	 * Constructs an LightweightEditDomain and loads the default tool.
 	 */
 	public LightweightEditDomain() {
+		this.disabledTool = new DisabledTool();
+	}
+	
+	public void setDisabled(boolean disabled) {
+		this.disabled = disabled;
+		refreshViewers();
+	}
+	public boolean isDisabled() {
+		return disabled;
+	}
+
+	public List getViewers() {
+		return viewers;
+	}
+
+	protected void refreshViewers() {
+		Iterator iterator = new ArrayList(getViewers()).iterator();
+		while (iterator.hasNext()) {
+			EditPartViewer viewer = (EditPartViewer) iterator.next();
+			removeViewer(viewer);
+			addViewer(viewer);
+		}
 	}
 
 	/**
@@ -87,7 +113,7 @@ public class LightweightEditDomain {
 	 * @return the active Tool
 	 */
 	public Tool getActiveTool() {
-		return activeTool;
+		return isDisabled() ? disabledTool : activeTool;
 	}
 
 	/**
@@ -121,7 +147,7 @@ public class LightweightEditDomain {
 	public Tool getDefaultTool() {
 		if (defaultTool == null)
 			defaultTool = new SelectionTool();
-		return defaultTool;
+		return isDisabled() ? disabledTool : defaultTool;
 	}
 
 	/**
@@ -374,4 +400,16 @@ public class LightweightEditDomain {
 			tool.viewerExited(mouseEvent, viewer);
 	}
 
+	public class DisabledTool extends AbstractTool {
+		public DisabledTool() {
+			setDefaultCursor(SharedCursors.WAIT);
+			setUnloadWhenFinished(false);
+		}
+		protected boolean isViewerImportant(EditPartViewer viewer) {
+			return false;
+		}
+		protected String getCommandName() {
+			return null;
+		}
+	}
 }
