@@ -6,16 +6,17 @@
 	</projects>
 	<buildSpec>
 		<buildCommand>
-			<name>org.eclipse.emf.cdo.releng.version.VersionBuilder</name>
+			<name>org.eclipse.ui.externaltools.ExternalToolBuilder</name>
+			<triggers>full,incremental,</triggers>
 			<arguments>
 				<dictionary>
-					<key>release.path</key>
-					<value>/org.eclipse.gef.releng/release.xml</value>
+					<key>LaunchConfigHandle</key>
+					<value>&lt;project&gt;/.externalToolBuilders/org.eclipse.oomph.version.VersionBuilder.launch</value>
 				</dictionary>
 			</arguments>
 		</buildCommand>
 	</buildSpec>
 	<natures>
-		<nature>org.eclipse.emf.cdo.releng.version.VersionNature</nature>
+		<nature>org.eclipse.oomph.version.VersionNature</nature>
 	</natures>
 </projectDescription>

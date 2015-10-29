@@ -5,16 +5,17 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.eclipse.gef</groupId>
 	<artifactId>org.eclipse.gef.releng</artifactId>
-	<version>3.10.200-SNAPSHOT</version>
+	<version>3.11.200-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<!-- this is the parent POM from which all modules inherit common settings -->
 	<properties>
-		<tycho-version>0.23.0</tycho-version>
-		<tycho-extras-version>0.19.0</tycho-extras-version>
+		<maven-antrun-plugin.version>1.7</maven-antrun-plugin.version>
+		<tycho.version>0.23.0</tycho.version>
 		<cbi-plugins.version>1.0.4</cbi-plugins.version>
-		<antrun-version>1.6</antrun-version>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
+		<tycho.scmUrl>scm:git:git://git.eclipse.org/gitroot/gef/org.eclipse.gef.git</tycho.scmUrl>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 	<build>
@@ -23,21 +24,38 @@
 				<!-- enable tycho build extension -->
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-maven-plugin</artifactId>
-				<version>${tycho-version}</version>
+				<version>${tycho.version}</version>
 				<extensions>true</extensions>
 			</plugin>
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-compiler-plugin</artifactId>
-				<version>${tycho-version}</version>
+				<version>${tycho.version}</version>
 				<configuration>
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-packaging-plugin</artifactId>
+				<version>${tycho.version}</version>
+				<configuration>
+					<sourceReferences>
+						<generate>true</generate>
+					</sourceReferences>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.eclipse.tycho.extras</groupId>
+						<artifactId>tycho-sourceref-jgit</artifactId>
+						<version>${tycho.version}</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-source-plugin</artifactId>
-				<version>${tycho-version}</version>
+				<version>${tycho.version}</version>
 				<executions>
 					<execution>
 						<id>plugin-source</id>
@@ -50,73 +68,73 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
-				<version>${antrun-version}</version>
+				<version>${maven-antrun-plugin.version}</version>
 				<executions>
 					<execution>
-						<id>replace-build-token</id>
-						<phase>generate-sources</phase>
+						<id>replace-tokens</id>
+						<phase>process-resources</phase>
 						<configuration>
-							<tasks>
+							<target>
 								<taskdef resource="net/sf/antcontrib/antcontrib.properties"
 									classpathref="maven.plugin.classpath" />
 								<if>
 									<available file="about.mappings" />
 									<then>
+										<echo message="Creating backup of about.mappings." />
+										<copy file="about.mappings" tofile="about.mappings.backup"
+											overwrite="true" />
 										<echo
-											message="Replacing @build@ token within about.mappings with build id" />
+											message="Replacing @build@ token within about.mappings with build id." />
 										<replace file="about.mappings">
-											<replacefilter token="@build@"
-												value="${unqualifiedVersion}.${buildQualifier}" />
+											<replacefilter token="@build@" value="${buildQualifier}" />
 										</replace>
 									</then>
 								</if>
 								<if>
 									<available file="javadocOptions.txt" />
 									<then>
-										<echo
-											message="Replacing @build@ token within javadocOptions.txt with build id" />
+										<copy file="javadocOptions.txt" tofile="javadocOptions.txt.backup"
+											overwrite="true" />
+										<echo message="Creating backup of javadocOptions.txt" />
 										<replace file="javadocOptions.txt">
 											<replacefilter token="@build@"
 												value="${unqualifiedVersion}.${buildQualifier}" />
 										</replace>
 									</then>
 								</if>
-							</tasks>
+							</target>
 						</configuration>
 						<goals>
 							<goal>run</goal>
 						</goals>
 					</execution>
 					<execution>
-						<id>replace-back-build-token</id>
-						<phase>install</phase>
+						<id>replace-back-tokens</id>
+						<phase>verify</phase>
 						<configuration>
-							<tasks>
+							<target>
 								<taskdef resource="net/sf/antcontrib/antcontrib.properties"
 									classpathref="maven.plugin.classpath" />
 								<if>
-									<available file="about.mappings" />
+									<available file="about.mappings.backup" />
 									<then>
-										<echo
-											message="Replacing back build id within about.mappings with @build@ token" />
-										<replace file="about.mappings">
-											<replacefilter token="${unqualifiedVersion}.${buildQualifier}"
-												value="@build@" />
-										</replace>
+										<echo message="Replacing back modified about.mappings with backup." />
+										<copy file="about.mappings.backup" tofile="about.mappings"
+											overwrite="true" />
+										<delete file="about.mappings.backup" />
 									</then>
 								</if>
 								<if>
-									<available file="javadocOptions.txt" />
+									<available file="javadocOptions.txt.backup" />
 									<then>
 										<echo
-											message="Replacing back build id within javadocOptions.txt with @build@ token" />
-										<replace file="javadocOptions.txt">
-											<replacefilter token="${unqualifiedVersion}.${buildQualifier}"
-												value="@build@" />
-										</replace>
+											message="Replacing back modified javadocOptions.txt with backup." />
+										<copy file="javadocOptions.txt.backup" tofile="javadocOptions.txt"
+											overwrite="true" />
+										<delete file="javadocOptions.txt.backup" />
 									</then>
 								</if>
-							</tasks>
+							</target>
 						</configuration>
 						<goals>
 							<goal>run</goal>
@@ -145,7 +163,7 @@
 					<plugin>
 						<groupId>org.eclipse.tycho</groupId>
 						<artifactId>target-platform-configuration</artifactId>
-						<version>${tycho-version}</version>
+						<version>${tycho.version}</version>
 						<configuration>
 							<!-- consider pack.gz bundles -->
 							<includePackedArtifacts>true</includePackedArtifacts>
@@ -154,7 +172,7 @@
 								<artifact>
 									<groupId>org.eclipse.gef</groupId>
 									<artifactId>org.eclipse.gef.target</artifactId>
-									<version>3.10.200-SNAPSHOT</version>
+									<version>3.11.200-SNAPSHOT</version>
 									<classifier>MARS</classifier>
 								</artifact>
 							</target>
@@ -197,7 +215,7 @@
 					<plugin>
 						<groupId>org.eclipse.tycho</groupId>
 						<artifactId>target-platform-configuration</artifactId>
-						<version>${tycho-version}</version>
+						<version>${tycho.version}</version>
 						<configuration>
 							<!-- consider pack.gz bundles -->
 							<includePackedArtifacts>true</includePackedArtifacts>
@@ -249,14 +267,14 @@
 					<plugin>
 						<groupId>org.eclipse.tycho</groupId>
 						<artifactId>target-platform-configuration</artifactId>
-						<version>${tycho-version}</version>
+						<version>${tycho.version}</version>
 						<configuration>
 							<!-- add target file content to target platform -->
 							<target>
 								<artifact>
 									<groupId>org.eclipse.gef</groupId>
 									<artifactId>org.eclipse.gef.target</artifactId>
-									<version>3.10.200-SNAPSHOT</version>
+									<version>3.11.200-SNAPSHOT</version>
 									<classifier>KEPLER_4_3</classifier>
 								</artifact>
 							</target>
@@ -299,7 +317,7 @@
 					<plugin>
 						<groupId>org.eclipse.tycho</groupId>
 						<artifactId>tycho-compiler-plugin</artifactId>
-						<version>${tycho-version}</version>
+						<version>${tycho.version}</version>
 						<configuration>
 							<useJDK>BREE</useJDK>
 						</configuration>
@@ -307,7 +325,7 @@
 					<plugin>
 						<groupId>org.eclipse.tycho.extras</groupId>
 						<artifactId>tycho-pack200a-plugin</artifactId>
-						<version>${tycho-extras-version}</version>
+						<version>${tycho.version}</version>
 						<executions>
 							<execution>
 								<id>pack200-normalize</id>
@@ -335,7 +353,7 @@
 					<plugin>
 						<groupId>org.eclipse.tycho.extras</groupId>
 						<artifactId>tycho-pack200b-plugin</artifactId>
-						<version>${tycho-extras-version}</version>
+						<version>${tycho.version}</version>
 						<executions>
 							<execution>
 								<id>pack200-pack</id>
@@ -349,7 +367,7 @@
 					<plugin>
 						<groupId>org.eclipse.tycho</groupId>
 						<artifactId>tycho-p2-plugin</artifactId>
-						<version>${tycho-version}</version>
+						<version>${tycho.version}</version>
 						<executions>
 							<execution>
 								<id>p2-metadata</id>
@@ -378,7 +396,7 @@
 	<modules>
 		<module>../org.eclipse.gef.target</module>
 		<module>../org.eclipse.draw2d</module>
-		<module>../org.eclipse.draw2d.test</module>
+		<module>../org.eclipse.draw2d.tests</module>
 		<module>../org.eclipse.draw2d.doc.isv</module>
 		<module>../org.eclipse.draw2d-feature</module>
 		<module>../org.eclipse.draw2d.source-feature</module>
@@ -386,7 +404,7 @@
 		<module>../org.eclipse.gef.lightweight</module>
 		<module>../org.eclipse.gef.lightweight-feature</module>
 		<module>../org.eclipse.gef</module>
-		<module>../org.eclipse.gef.test</module>
+		<module>../org.eclipse.gef.tests</module>
 		<module>../org.eclipse.gef.doc.isv</module>
 		<module>../org.eclipse.gef.examples.flow</module>
 		<module>../org.eclipse.gef.examples.logic</module>
@@ -396,8 +414,6 @@
 		<module>../org.eclipse.gef.examples.ui.pde</module>
 		<module>../org.eclipse.gef.source-feature</module>
 		<module>../org.eclipse.gef-feature</module>
-		<module>../org.eclipse.gef.test.source-feature</module>
-		<module>../org.eclipse.gef.test-feature</module>
 		<module>../org.eclipse.gef.examples.source-feature</module>
 		<module>../org.eclipse.gef.examples-feature</module>
 		<module>../org.eclipse.gef.sdk-feature</module>
