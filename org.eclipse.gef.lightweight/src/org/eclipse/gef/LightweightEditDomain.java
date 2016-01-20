@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.gef;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -29,25 +31,41 @@ import org.eclipse.swt.widgets.Event;
  * CommandStack, one or more EditPartViewers, and the active Tool.
  */
 public class LightweightEditDomain {
+	public static final String PROPERTY_DISABLED = "disabled";
 
 	private Tool defaultTool;
 	private Tool activeTool;
+	protected Tool disabledTool;
 	private List viewers = new ArrayList();
 	private CommandStack commandStack = new CommandStack();
 	protected boolean disabled;
-	protected Tool disabledTool;
+	protected PropertyChangeSupport changeSupport;
 
 	/**
 	 * Constructs an LightweightEditDomain and loads the default tool.
 	 */
 	public LightweightEditDomain() {
 		this.disabledTool = new DisabledTool();
+		this.changeSupport = new PropertyChangeSupport(this);
 	}
-	
+
+	public void addPropertyChangeListener(PropertyChangeListener listener) {
+		changeSupport.addPropertyChangeListener(listener);
+	}
+	public void removePropertyChangeListener(PropertyChangeListener listener) {
+		changeSupport.removePropertyChangeListener(listener);
+	}
+
 	public void setDisabled(boolean disabled) {
+		if (this.disabled == disabled)
+			return;
+
 		this.disabled = disabled;
 		refreshViewers();
+
+		changeSupport.firePropertyChange(PROPERTY_DISABLED, !isDisabled(), isDisabled());
 	}
+
 	public boolean isDisabled() {
 		return disabled;
 	}
