@@ -3,7 +3,8 @@
 sudo: false
 language: java
 jdk: oraclejdk8
+before_install:
+  - echo "MAVEN_OPTS='-Xmx2g'" > ~/.mavenrc
 script:
-  - export MAVEN_OPTS="-Xms512M -Xmx2048M"
   - mvn -f org.eclipse.gef.releng/pom.xml -P MARS_4_5.target package
 
