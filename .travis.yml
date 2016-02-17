@@ -4,5 +4,6 @@ sudo: false
 language: java
 jdk: oraclejdk8
 script:
+  - export MAVEN_OPTS="-Xms512M -Xmx2048M"
   - mvn -f org.eclipse.gef.releng/pom.xml -P MARS_4_5.target package
 
