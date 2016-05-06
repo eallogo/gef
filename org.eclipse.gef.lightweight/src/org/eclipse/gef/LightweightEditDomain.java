@@ -78,8 +78,8 @@ public class LightweightEditDomain {
 		Iterator iterator = new ArrayList(getViewers()).iterator();
 		while (iterator.hasNext()) {
 			EditPartViewer viewer = (EditPartViewer) iterator.next();
-			removeViewer(viewer);
-			addViewer(viewer);
+			viewer.setEditDomain(null);
+			viewer.setEditDomain(this);
 		}
 	}
 
