@@ -3,7 +3,7 @@
 # Script may take 6-7 command line parameters:
 # $1: Hudson job name: <name>
 # $2: Hudson build id: <id>
-# $3: Build type: i(nterim), s(table), r(elease)
+# $3: Build type: i(ntegration), s(table), r(elease)
 # $4: Whether to promote to an update-site: (y)es, (n)o
 # $5: Whether to merge the site with an existing one: (y)es, (n)o
 # $6: Whether to generate drop files: (y)es, (n)o
@@ -103,14 +103,14 @@ if [ "$site" = y ];
 then
 	# Determine remote update site we want to promote to
 	case $buildType in
-		i|I) remoteSite=interim;;
+		i|I) remoteSite=integration;;
 		s|S) remoteSite=milestones;;
 		r|R) remoteSite=releases;;
 		*) 
-		echo "Parameter buildType has to be 'i'(nterim), 's'(table), or 'r'(elease), but was: $buildType"
+		echo "Parameter buildType has to be 'i'(ntegration), 's'(table), or 'r'(elease), but was: $buildType"
 		exit 1 ;;
 	esac
-	remoteUpdateSiteBase="tools/gef/updates/$remoteSite"
+	remoteUpdateSiteBase="tools/gef/updates/legacy/$remoteSite"
 	remoteUpdateSite="/home/data/httpd/download.eclipse.org/$remoteUpdateSiteBase"
 	echo "Publishing to remote update-site: $remoteUpdateSite"
 
@@ -160,8 +160,8 @@ cd $tmpDir
 
 # Download and prepare Eclipse SDK, which is needed to merge update site and postprocess repository 
 echo "Downloading eclipse to $PWD"
-cp /home/data/httpd/download.eclipse.org/eclipse/downloads/drops4/R-4.4.2-201502041700/eclipse-SDK-4.4.2-linux-gtk-x86_64.tar.gz .
-tar -xvzf eclipse-SDK-4.4.2-linux-gtk-x86_64.tar.gz
+cp /home/data/httpd/download.eclipse.org/eclipse/downloads/drops4/R-4.5.2-201602121500/eclipse-SDK-4.5.2-linux-gtk-x86_64.tar.gz .
+tar -xvzf eclipse-SDK-4.5.2-linux-gtk-x86_64.tar.gz
 cd eclipse
 chmod 700 eclipse
 cd ..
@@ -175,7 +175,7 @@ echo "Installing WTP Releng tools"
 ./eclipse/eclipse -nosplash --launcher.suppressErrors -clean -debug -application org.eclipse.equinox.p2.director -repository http://download.eclipse.org/webtools/releng/repository/ -installIUs org.eclipse.wtp.releng.tools.feature.feature.group
 # Clean up
 echo "Cleaning up"
-rm eclipse-SDK-4.4.2-linux-gtk-x86_64.tar.gz
+rm eclipse-SDK-4.5.2-linux-gtk-x86_64.tar.gz
 
 # Generate drop files
 if [ "$dropFiles" = y ];
@@ -196,9 +196,9 @@ if [ "$dropFiles" = y ];
     mkdir -p $localDropDir
     
     cd update-site
-    zip -r ../$localDropDir/GEF-Update-${releaseLabel}${releaseLabelSuffix}.zip features plugins artifacts.jar content.jar
-    md5sum ../$localDropDir/GEF-Update-${releaseLabel}${releaseLabelSuffix}.zip > ../$localDropDir/GEF-Update-${releaseLabel}${releaseLabelSuffix}.zip.md5
-    echo "Created GEF-Update-Site-${releaseLabel}${releaseLabelSuffix}.zip"  
+    zip -r ../$localDropDir/GEF3-Update-${releaseLabel}${releaseLabelSuffix}.zip features plugins artifacts.jar content.jar
+    md5sum ../$localDropDir/GEF3-Update-${releaseLabel}${releaseLabelSuffix}.zip > ../$localDropDir/GEF3-Update-${releaseLabel}${releaseLabelSuffix}.zip.md5
+    echo "Created GEF3-Update-Site-${releaseLabel}${releaseLabelSuffix}.zip"  
     cd .. 
 
     # Cleanup local update site (for drop files generation)
@@ -209,7 +209,7 @@ if [ "$dropFiles" = y ];
     echo "hudson.job.id=$buildId (${jobDir##*/})" >> $localDropDir/build.cfg
     echo "hudson.job.url=https://hudson.eclipse.org/gef/job/$jobName/$buildId" >> $localDropDir/build.cfg
 
-    remoteDropDir=/home/data/httpd/download.eclipse.org/tools/gef/downloads/drops/$dropDir
+    remoteDropDir=/home/data/httpd/download.eclipse.org/tools/gef/downloads/drops/legacy/$dropDir
     mkdir -p $remoteDropDir
     cp -R $localDropDir/* $remoteDropDir/
 fi
@@ -245,7 +245,7 @@ then
 content="
 <?xml version='1.0' encoding='UTF-8'?>
 <?compositeMetadataRepository version='1.0.0'?>
-<repository name='GEF ${remoteSite}' type='org.eclipse.equinox.internal.p2.metadata.repository.CompositeMetadataRepository' version='1.0.0'>
+<repository name='GEF 3.x ${remoteSite}' type='org.eclipse.equinox.internal.p2.metadata.repository.CompositeMetadataRepository' version='1.0.0'>
 <properties size='1'>
 <property name='p2.timestamp' value='${timestamp}'/>
 </properties>
@@ -265,7 +265,7 @@ done
 artifact="
 <?xml version='1.0' encoding='UTF-8'?>
 <?compositeArtifactRepository version='1.0.0'?>
-<repository name='GEF ${remoteSite}' type='org.eclipse.equinox.internal.p2.artifact.repository.CompositeArtifactRepository' version='1.0.0'>
+<repository name='GEF 3.x ${remoteSite}' type='org.eclipse.equinox.internal.p2.artifact.repository.CompositeArtifactRepository' version='1.0.0'>
 <properties size='1'>
 <property name='p2.timestamp' value='${timestamp}'/>
 </properties>
