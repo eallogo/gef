@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.gef.resources;
 
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 
@@ -28,7 +27,6 @@ public class GEFResources {
 	private IImageDescriptorFactory imageDescriptorFactory;
 
 	private ImageRegistry imageRegistry;	
-	private IPreferenceStore preferenceStore;	
 
 	/**
 	 * Return the default instance of the receiver.
@@ -71,14 +69,6 @@ public class GEFResources {
 	public ImageRegistry getImageRegistry() {
 		checkInitialized(imageRegistry);
 		return imageRegistry;
-	}
-
-	public void setPreferenceStore(IPreferenceStore preferenceStore) {
-		this.preferenceStore = preferenceStore;
-	}
-	public IPreferenceStore getPreferenceStore() {
-		checkInitialized(preferenceStore);
-		return preferenceStore;
 	}
 
 	public void checkInitialized(Object object) {

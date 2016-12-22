@@ -35,7 +35,6 @@ public class InternalGEFPlugin extends AbstractUIPlugin {
 		context = bc;
 
 		GEFResources.getInstance().setImageRegistry(getImageRegistry());
-		GEFResources.getInstance().setPreferenceStore(getPreferenceStore());
 		IImageDescriptorFactory factory = new IImageDescriptorFactory() {
 			public ImageDescriptor createFolder() {
 				ISharedImages sharedImages = PlatformUI.getWorkbench()
@@ -54,8 +53,8 @@ public class InternalGEFPlugin extends AbstractUIPlugin {
 			public ImageDescriptor createDelete() {
 				ISharedImages sharedImages = PlatformUI.getWorkbench()
 						.getSharedImages();
-				return sharedImages
-						.getImageDescriptor(ISharedImages.IMG_TOOL_DELETE_DISABLED);
+				return sharedImages.getImageDescriptor(
+						ISharedImages.IMG_TOOL_DELETE_DISABLED);
 			}
 		};
 		GEFResources.getInstance().setImageDescriptorFactory(factory);

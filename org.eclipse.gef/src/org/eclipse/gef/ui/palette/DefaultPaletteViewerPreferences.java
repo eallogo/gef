@@ -20,7 +20,7 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 
-import org.eclipse.gef.resources.GEFResources;
+import org.eclipse.gef.internal.InternalGEFPlugin;
 
 /**
  * This is the default implementation for PaletteViewerPreferences. It uses a
@@ -39,8 +39,8 @@ import org.eclipse.gef.resources.GEFResources;
  * 
  * @author Pratik Shah
  */
-public class DefaultPaletteViewerPreferences implements
-		PaletteViewerPreferences {
+public class DefaultPaletteViewerPreferences
+		implements PaletteViewerPreferences {
 
 	private static final String DEFAULT_FONT = "Default"; //$NON-NLS-1$
 
@@ -59,7 +59,7 @@ public class DefaultPaletteViewerPreferences implements
 	 * </p>
 	 */
 	public DefaultPaletteViewerPreferences() {
-		this(GEFResources.getInstance().getPreferenceStore());
+		this(InternalGEFPlugin.getDefault().getPreferenceStore());
 	}
 
 	/**
@@ -84,8 +84,8 @@ public class DefaultPaletteViewerPreferences implements
 		fontListener = new IPropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent event) {
 				if (JFaceResources.DIALOG_FONT.equals(event.getProperty())) {
-					if (getPreferenceStore().getString(PREFERENCE_FONT).equals(
-							DEFAULT_FONT)) {
+					if (getPreferenceStore().getString(PREFERENCE_FONT)
+							.equals(DEFAULT_FONT)) {
 						setFontData(JFaceResources.getDialogFont()
 								.getFontData()[0]);
 						handlePreferenceStorePropertyChanged(PREFERENCE_FONT);
@@ -235,7 +235,8 @@ public class DefaultPaletteViewerPreferences implements
 		if (property.equals(PREFERENCE_LAYOUT)) {
 			firePropertyChanged(property, new Integer(getLayoutSetting()));
 		} else if (property.equals(PREFERENCE_AUTO_COLLAPSE)) {
-			firePropertyChanged(property, new Integer(getAutoCollapseSetting()));
+			firePropertyChanged(property,
+					new Integer(getAutoCollapseSetting()));
 		} else if (property.equals(PREFERENCE_FONT)) {
 			firePropertyChanged(property, getFontData());
 		} else {
@@ -314,13 +315,13 @@ public class DefaultPaletteViewerPreferences implements
 	 */
 	public void setSupportedLayoutModes(int[] modes) {
 		supportedModes = modes;
-		if (!isSupportedLayoutMode(getPreferenceStore().getDefaultInt(
-				PREFERENCE_LAYOUT))) {
+		if (!isSupportedLayoutMode(
+				getPreferenceStore().getDefaultInt(PREFERENCE_LAYOUT))) {
 			getPreferenceStore().setDefault(PREFERENCE_LAYOUT,
 					supportedModes[0]);
 		}
-		if (!isSupportedLayoutMode(getPreferenceStore().getInt(
-				PREFERENCE_LAYOUT))) {
+		if (!isSupportedLayoutMode(
+				getPreferenceStore().getInt(PREFERENCE_LAYOUT))) {
 			setLayoutSetting(supportedModes[0]);
 		}
 	}
@@ -338,8 +339,8 @@ public class DefaultPaletteViewerPreferences implements
 	 * @see org.eclipse.gef.ui.palette.PaletteViewerPreferences#useLargeIcons(int)
 	 */
 	public boolean useLargeIcons(int layout) {
-		return getPreferenceStore().getBoolean(
-				convertLayoutToPreferenceName(layout));
+		return getPreferenceStore()
+				.getBoolean(convertLayoutToPreferenceName(layout));
 	}
 
 	/**
